@@ -9,14 +9,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -28,10 +25,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.starter.springbootstarter.models.Book;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest
 public class BooksControllerTest {
 
-    @InjectMocks
+    @Autowired
     BooksController subject;
 
     MockMvc mockMvc;
@@ -41,10 +38,6 @@ public class BooksControllerTest {
     @BeforeEach
     public void setup() {
         this.mockMvc = MockMvcBuilders.standaloneSetup(subject).build();
-        BooksController.allBooks = new ArrayList<>(
-                List.of(
-                        new Book(0L, "Harry Potter", "123-54231"),
-                        new Book(1L, "Lord Of the Rings", "100-54321")));
     }
 
     @Test
@@ -77,14 +70,15 @@ public class BooksControllerTest {
 
     @Test
     void testFind() throws Exception {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        mockMvc.perform(get("/api/v1/books/1").headers(headers))
+        mockMvc.perform(get("/api/v1/books/0").headers(headers))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Lord Of the Rings"))
-                .andExpect(jsonPath("$.isbn").value("100-54321"));
+                .andExpect(jsonPath("$.name").value("Harry Potter"))
+                .andExpect(jsonPath("$.isbn").value("123-54231"));
     }
 
     @Test
@@ -107,7 +101,7 @@ public class BooksControllerTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        mockMvc.perform(put("/api/v1/books/1").headers(headers)
+        mockMvc.perform(put("/api/v1/books/2").headers(headers)
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isOk())

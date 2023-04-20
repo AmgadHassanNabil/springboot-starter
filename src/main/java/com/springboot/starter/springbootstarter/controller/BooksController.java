@@ -1,9 +1,8 @@
 package com.springboot.starter.springbootstarter.controller;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,60 +16,58 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.springboot.starter.springbootstarter.models.Book;
+import com.springboot.starter.springbootstarter.services.BookService;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/books")
+@AllArgsConstructor
 public class BooksController {
 
-    static List<Book> allBooks = new ArrayList<>(
-            List.of(
-                    new Book(0L, "Harry Potter", "123-54231"),
-                    new Book(1L, "Lord Of the Rings", "100-54321")));
+    final BookService bookService;
 
     @GetMapping
     public List<Book> findAll() {
-        return allBooks;
+        return bookService.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Book> find(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(allBooks.stream().filter(book -> book.id() == id).findFirst().orElseThrow());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Optional<Book> item = this.bookService.find(id);
+        return ResponseEntity.of(item);
     }
 
     @PostMapping
     public ResponseEntity<Book> create(@RequestBody Book requestBook) {
-        Integer id = allBooks.size();
-        Book book = new Book(id.longValue(), requestBook.name(), requestBook.isbn());
-        allBooks.add(book);
+        Book book = this.bookService.create(new Book(null, requestBook.getName(), requestBook.getIsbn()));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(book.getId())
                 .toUri();
         return ResponseEntity.created(location).body(book);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Book> update(@PathVariable Long id, @RequestBody Book requestBook) {
-        int i = 0;
-        for (; i < allBooks.size(); i++)
-            if (allBooks.get(i).id() == id) {
-                Book book = new Book(id, requestBook.name() == null ? allBooks.get(i).name() : requestBook.name(),
-                        requestBook.isbn() == null ? allBooks.get(i).isbn() : requestBook.isbn());
 
-                allBooks.set(i, book);
-                break;
-            }
+        Optional<Book> updated = this.bookService.update(id, requestBook);
 
-        return ResponseEntity.ok().body(allBooks.get(i));
+        return updated
+                .map(value -> ResponseEntity.ok().body(value))
+                .orElseGet(() -> {
+                    Book created = this.bookService.create(requestBook);
+                    URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                            .path("/{id}")
+                            .buildAndExpand(created.getId())
+                            .toUri();
+                    return ResponseEntity.created(location).body(created);
+                });
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        allBooks.removeIf(book -> book.id() == id);
+        this.bookService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

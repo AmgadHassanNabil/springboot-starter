@@ -1,0 +1,2 @@
+INSERT INTO BOOK(id, NAME, ISBN) VALUES(0, 'Harry Potter', '123-54231');
+INSERT INTO BOOK(id, NAME, ISBN) VALUES(2, 'Lord Of the Rings', '100-54321');

@@ -1,4 +1,4 @@
-package com.springboot.starter.services;
+package com.springboot.starter.springbootstarter.services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,19 +24,21 @@ public class BookService {
         return list;
     }
 
-    public Optional<Book> find(Long id) {
+    public Optional<Book> find(long id) {
         return repository.findById(id);
     }
 
     public Book create(Book book) {
-        Book newBook = new Book(null, book.name(), book.isbn());
+        Book newBook = new Book(null, book.getName(), book.getIsbn());
         return this.repository.save(newBook);
     }
 
     public Optional<Book> update(Long id, Book newBook) {
         return repository.findById(id)
                 .map(oldBook -> {
-                    Book updated = new Book(oldBook.id(), newBook.name(), newBook.isbn());
+                    Book updated = new Book(oldBook.getId(),
+                            newBook.getName() == null ? oldBook.getName() : newBook.getName(),
+                            newBook.getIsbn() == null ? oldBook.getIsbn() : newBook.getIsbn());
                     return repository.save(updated);
                 });
     }
