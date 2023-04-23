@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.springboot.starter.springbootstarter.models.Book;
@@ -29,7 +30,7 @@ public class BookService {
     }
 
     public Book create(Book book) {
-        Book newBook = new Book(null, book.getName(), book.getIsbn());
+        Book newBook = new Book(null, book.getName(), book.getIsbn(), book.getInventoryCount(), false);
         return this.repository.save(newBook);
     }
 
@@ -38,9 +39,16 @@ public class BookService {
                 .map(oldBook -> {
                     Book updated = new Book(oldBook.getId(),
                             newBook.getName() == null ? oldBook.getName() : newBook.getName(),
-                            newBook.getIsbn() == null ? oldBook.getIsbn() : newBook.getIsbn());
+                            newBook.getIsbn() == null ? oldBook.getIsbn() : newBook.getIsbn(),
+                            newBook.getInventoryCount() == null ? oldBook.getInventoryCount()
+                                    : newBook.getInventoryCount(),
+                            newBook.getDeleted() == null ? oldBook.getDeleted() : newBook.getDeleted());
                     return repository.save(updated);
                 });
+    }
+
+    public List<Book> findInsufficientBooks() {
+        return this.repository.findAllBooksWithInventoryCount(3, Sort.by("isbn"));
     }
 
     public void delete(Long id) {

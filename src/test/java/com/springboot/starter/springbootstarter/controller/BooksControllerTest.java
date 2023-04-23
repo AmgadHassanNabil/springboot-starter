@@ -43,7 +43,7 @@ public class BooksControllerTest {
     @Test
     void testCreate() throws JsonProcessingException, Exception {
 
-        Book request = new Book(null, "Tale Of Two Cities", "100-0009990");
+        Book request = new Book(null, "Tale Of Two Cities", "100-0009990", 5, false);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -97,7 +97,7 @@ public class BooksControllerTest {
     @Test
     void testUpdate() throws Exception {
 
-        Book request = new Book(null, "Tale Of Two Cities", null);
+        Book request = new Book(null, "Tale Of Two Cities", null, 2, null);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

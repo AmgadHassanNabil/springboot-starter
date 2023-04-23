@@ -40,7 +40,8 @@ public class BooksController {
 
     @PostMapping
     public ResponseEntity<Book> create(@RequestBody Book requestBook) {
-        Book book = this.bookService.create(new Book(null, requestBook.getName(), requestBook.getIsbn()));
+        Book book = this.bookService.create(
+                new Book(null, requestBook.getName(), requestBook.getIsbn(), requestBook.getInventoryCount(), null));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(book.getId())
@@ -63,6 +64,11 @@ public class BooksController {
                             .toUri();
                     return ResponseEntity.created(location).body(created);
                 });
+    }
+
+    @GetMapping("/insufficientBooks")
+    public ResponseEntity<List<Book>> insufficientBooks() {
+        return ResponseEntity.ok(this.bookService.findInsufficientBooks());
     }
 
     @DeleteMapping("/{id}")

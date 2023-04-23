@@ -1,2 +1,2 @@
-INSERT INTO BOOK(id, NAME, ISBN) VALUES(0, 'Harry Potter', '123-54231');
-INSERT INTO BOOK(id, NAME, ISBN) VALUES(2, 'Lord Of the Rings', '100-54321');
+INSERT INTO BOOK(id, NAME, ISBN, inventory_Count, deleted) VALUES(0, 'Harry Potter', '123-54231', 2, 0);
+INSERT INTO BOOK(id, NAME, ISBN, inventory_Count, deleted) VALUES(2, 'Lord Of the Rings', '100-54321', 5, 0);
